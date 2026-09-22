@@ -14,9 +14,7 @@ export default function SearchBar() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const params = new URLSearchParams(
-      searchParams.toString()
-    );
+    const params = new URLSearchParams(searchParams.toString());
 
     if (value.trim()) {
       params.set("search", value.trim());
@@ -40,17 +38,15 @@ export default function SearchBar() {
         <input
           type="search"
           value={value}
-          onChange={(event) =>
-            setValue(event.target.value)
-          }
+          onChange={(event) => setValue(event.target.value)}
           placeholder="Buscar por nombre, referencia o marca..."
-          className="h-14 w-full rounded-l-2xl border border-gray-300 bg-white pl-12 pr-4 text-sm text-black placeholder:text-gray-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="h-12 w-full rounded-l-xl border border-gray-300 bg-white pl-12 pr-4 text-sm text-black placeholder:text-gray-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
       </div>
 
       <button
         type="submit"
-        className="rounded-r-2xl bg-blue-600 px-6 text-sm font-semibold text-white transition hover:bg-blue-700"
+        className="rounded-r-xl bg-blue-600 px-5 text-sm font-semibold text-white transition hover:bg-blue-700"
       >
         Buscar
       </button>

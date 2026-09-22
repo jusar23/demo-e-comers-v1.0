@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import ProductCard from "@/components/ProductCard";
 import ProductFilters from "@/components/ProductFilters";
-import SearchBar from "@/components/SearchBar";
+import BannerRotativo from "@/components/BannerRotativo";
+import CategorySection from "@/components/CategorySection";
+import FeaturedProducts from "@/components/FeaturedProducts";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -23,6 +25,7 @@ export default async function Home({
   const sort = params.sort ?? "";
 
   const products = await prisma.product.findMany({
+    
     where: {
       ...(search
         ? {
@@ -77,7 +80,12 @@ export default async function Home({
             ? { name: "asc" }
             : { createdAt: "desc" },
   });
-
+  const featuredProducts = await prisma.product.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 8,
+  });
   const categoriesResult = await prisma.product.findMany({
     select: {
       category: true,
@@ -111,34 +119,26 @@ export default async function Home({
     price: Number(product.price),
   }));
 
+  const formattedFeaturedProducts = featuredProducts.map(
+    (product) => ({
+      ...product,
+      price: Number(product.price),
+    })
+  );
+
   return (
     <main className="min-h-screen bg-gray-50">
       
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-700 to-blue-500 px-6 py-16 text-white">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-wider text-blue-100">
-              Tienda de repuestos
-            </p>
+     <BannerRotativo />
+     
+      {/*selection*/}
+     <CategorySection />
 
-            <h1 className="mt-3 text-4xl font-bold tracking-tight md:text-5xl">
-              Encuentra el repuesto que necesitas
-            </h1>
-
-            <p className="mt-5 text-lg text-blue-100">
-              Explora nuestro catálogo de repuestos y
-              encuentra productos por nombre, referencia
-              o marca.
-            </p>
-          </div>
-
-          <div className="mt-8 max-w-4xl">
-            <SearchBar />
-          </div>
-        </div>
-      </section>
-
+      {/* Featured */}
+    <FeaturedProducts
+      products={formattedFeaturedProducts}/>
+      
       {/* Catálogo */}
       <section
         id="productos"
