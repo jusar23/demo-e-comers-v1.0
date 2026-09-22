@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm install",
-    "start": "node index.js",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma skills sync || exit 0",
     "db:seed": "tsx prisma/seed.ts"
