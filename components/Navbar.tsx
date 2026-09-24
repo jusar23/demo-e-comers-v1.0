@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import SearchBar from "./SearchBar";
 
 export default function Navbar() {
@@ -97,8 +97,10 @@ export default function Navbar() {
               BUSCADOR PC
           ========================== */}
           <div className="hidden flex-1 md:block md:max-w-md">
-            <SearchBar />
-          </div>
+            <Suspense fallback={null}>
+    <SearchBar />
+  </Suspense>
+</div>
 
           {/* =========================
               CARRITO
@@ -115,7 +117,9 @@ export default function Navbar() {
             BUSCADOR MÓVIL
         ========================== */}
         <div className="pb-3 md:hidden">
-          <SearchBar />
+          <Suspense fallback={null}>
+            <SearchBar />
+          </Suspense>           
         </div>
 
         {/* =========================
