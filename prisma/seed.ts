@@ -14,6 +14,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos",
+    refrigeration: "aire frozado",
     displacement: 197,
     horsepower: new Prisma.Decimal("12.7"),
     maxTorque: new Prisma.Decimal("13.9"),
@@ -43,6 +44,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos",
+    refrigeration: "líquida",
     displacement: 246,
     horsepower: new Prisma.Decimal("15.4"),
     maxTorque: new Prisma.Decimal("19.0"),
@@ -72,6 +74,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos",
+    refrigeration: "Líquida",
     displacement: 272,
     horsepower: new Prisma.Decimal("19"),
     maxTorque: new Prisma.Decimal("21"),
@@ -101,6 +104,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos, monocilíndrico OHV",
+    refrigeration: "aire frozado",
     displacement: 197,
     horsepower: new Prisma.Decimal("14.1"),
     maxTorque: new Prisma.Decimal("17.5"),
@@ -130,6 +134,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos, monocilíndrico OHV",
+    refrigeration: "líquida",
     displacement: 246,
     horsepower: new Prisma.Decimal("15.5"),
     maxTorque: new Prisma.Decimal("19.5"),
@@ -188,6 +193,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos, monocilíndrico OHV",
+    refrigeration: "Líquida",
     displacement: 275,
     horsepower: new Prisma.Decimal("17"),
     maxTorque: new Prisma.Decimal("21"),
@@ -217,6 +223,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos ecológico OHV",
+    refrigeration: "aire frozado",
     displacement: 197,
     horsepower: new Prisma.Decimal("13"),
     maxTorque: new Prisma.Decimal("13.9"),
@@ -246,6 +253,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos ecológico OHV",
+    refrigeration: "aire forzado",
     displacement: 197,
     horsepower: new Prisma.Decimal("13"),
     maxTorque: new Prisma.Decimal("13.9"),
@@ -275,6 +283,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos ecológico OHV",
+    refrigeration: "Líquida",
     displacement: 272,
     horsepower: new Prisma.Decimal("19"),
     maxTorque: new Prisma.Decimal("19.5"),
@@ -304,6 +313,7 @@ const motocargueros = [
     stock: 0,
 
     engineType: "4 tiempos ecológico OHV",
+    refrigeration: "Líquida",
     displacement: 272,
     horsepower: new Prisma.Decimal("19"),
     maxTorque: new Prisma.Decimal("19.5"),

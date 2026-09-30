@@ -32,6 +32,7 @@ model Motocarro {
   price           Decimal? @db.Decimal(12, 2)
   stock           Int      @default(0)
   engineType      String?
+  refrigeration   String?
   displacement    Int?
   horsepower      Decimal?
   maxTorque       Decimal?
