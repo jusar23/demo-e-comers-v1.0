@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
+import MotocarroGallery from "@/components/MotocarroGallery";
+
 type MotocarroDetailPageProps = {
   params: Promise<{
     slug: string;
@@ -33,10 +35,13 @@ export default async function MotocarroDetailPage({
 
   return (
     <main className="min-h-screen bg-gray-50">
+
       {/* MIGAS DE NAVEGACIÓN */}
       <div className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-4">
+
           <div className="flex items-center gap-2 text-sm text-gray-500">
+
             <Link
               href="/"
               className="transition hover:text-blue-600"
@@ -58,41 +63,29 @@ export default async function MotocarroDetailPage({
             <span className="font-medium text-gray-900">
               {motocarro.model}
             </span>
+
           </div>
+
         </div>
       </div>
 
       {/* INFORMACIÓN PRINCIPAL */}
       <section className="px-6 py-10 sm:py-14">
+
         <div className="mx-auto max-w-7xl">
+
           <div className="grid gap-10 lg:grid-cols-2">
-            {/* IMAGEN */}
-            <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
-              <div className="relative flex min-h-[400px] items-center justify-center bg-gray-100 sm:min-h-[500px]">
-                {motocarro.image ? (
-                  <img
-                    src={motocarro.image}
-                    alt={`${motocarro.brand} ${motocarro.model}`}
-                    className="h-full max-h-[550px] w-full object-contain"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <div className="text-8xl">🚚</div>
 
-                    <p className="mt-5 text-sm font-medium text-gray-400">
-                      Imagen del modelo próximamente
-                    </p>
-                  </div>
-                )}
-
-                <span className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-gray-700 shadow-md">
-                  {motocarro.brand}
-                </span>
-              </div>
-            </div>
+            {/* GALERÍA */}
+            <MotocarroGallery
+              images={motocarro.images}
+              fallbackImage={motocarro.image}
+              name={`${motocarro.brand} ${motocarro.model}`}
+            />
 
             {/* INFORMACIÓN */}
             <div className="flex flex-col justify-center">
+
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">
                 Motocarguero
               </p>
@@ -109,6 +102,7 @@ export default async function MotocarroDetailPage({
 
               {/* PRECIO */}
               <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5">
+
                 {price ? (
                   <>
                     <p className="text-sm text-gray-500">
@@ -128,11 +122,14 @@ export default async function MotocarroDetailPage({
                     Consultar precio
                   </p>
                 )}
+
               </div>
 
               {/* DATOS DESTACADOS */}
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
+
                   <p className="text-xs text-gray-500">
                     Cilindraje
                   </p>
@@ -142,9 +139,11 @@ export default async function MotocarroDetailPage({
                       ? `${motocarro.displacement} cc`
                       : "—"}
                   </p>
+
                 </div>
 
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
+
                   <p className="text-xs text-gray-500">
                     Potencia
                   </p>
@@ -154,9 +153,11 @@ export default async function MotocarroDetailPage({
                       ? `${horsepower} HP`
                       : "—"}
                   </p>
+
                 </div>
 
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
+
                   <p className="text-xs text-gray-500">
                     Carga
                   </p>
@@ -168,11 +169,14 @@ export default async function MotocarroDetailPage({
                         )} kg`
                       : "—"}
                   </p>
+
                 </div>
+
               </div>
 
               {/* BOTONES */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
                 <Link
                   href="/#contacto"
                   className="flex-1 rounded-xl bg-blue-600 px-6 py-4 text-center text-sm font-bold text-white transition hover:bg-blue-700"
@@ -186,13 +190,18 @@ export default async function MotocarroDetailPage({
                 >
                   Ver otros modelos
                 </Link>
+
               </div>
+
             </div>
+
           </div>
 
           {/* FICHA TÉCNICA */}
           <section className="mt-14">
+
             <div className="mb-7">
+
               <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
                 Especificaciones
               </p>
@@ -200,10 +209,13 @@ export default async function MotocarroDetailPage({
               <h2 className="mt-2 text-3xl font-bold text-gray-900">
                 Ficha técnica
               </h2>
+
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
               <div className="grid md:grid-cols-2">
+
                 <TechnicalRow
                   label="Marca"
                   value={motocarro.brand}
@@ -250,7 +262,7 @@ export default async function MotocarroDetailPage({
 
                 <TechnicalRow
                   label="Refrigeración"
-                  value={null}
+                  value={motocarro.refrigeration}
                 />
 
                 <TechnicalRow
@@ -314,10 +326,12 @@ export default async function MotocarroDetailPage({
                   label="Llantas"
                   value={motocarro.tires}
                 />
+
               </div>
 
               {motocarro.equipment && (
                 <div className="border-t border-gray-200 p-6">
+
                   <p className="text-sm font-semibold text-gray-500">
                     Equipamiento
                   </p>
@@ -325,12 +339,18 @@ export default async function MotocarroDetailPage({
                   <p className="mt-2 leading-7 text-gray-800">
                     {motocarro.equipment}
                   </p>
+
                 </div>
               )}
+
             </div>
+
           </section>
+
         </div>
+
       </section>
+
     </main>
   );
 }
@@ -344,6 +364,7 @@ function TechnicalRow({
 }) {
   return (
     <div className="border-b border-gray-200 p-5 last:border-b-0">
+
       <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
         {label}
       </p>
@@ -351,6 +372,7 @@ function TechnicalRow({
       <p className="mt-1 text-sm font-semibold text-gray-900">
         {value || "No especificado"}
       </p>
+
     </div>
   );
 }
