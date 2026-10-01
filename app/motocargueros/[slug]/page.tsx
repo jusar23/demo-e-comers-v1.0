@@ -24,7 +24,7 @@ export default async function MotocarroDetailPage({
   if (!motocarro) {
     notFound();
   }
-
+  
   const price = motocarro.price
     ? Number(motocarro.price)
     : null;
@@ -76,12 +76,13 @@ export default async function MotocarroDetailPage({
 
           <div className="grid gap-10 lg:grid-cols-2">
 
-            {/* GALERÍA */}
-            <MotocarroGallery
-              images={motocarro.images}
-              fallbackImage={motocarro.image}
-              name={`${motocarro.brand} ${motocarro.model}`}
-            />
+           {/* GALERÍA */}
+              <MotocarroGallery
+                images={motocarro.images}
+                fallbackImage={motocarro.image}
+                name={`${motocarro.brand} ${motocarro.model}`}
+              />
+
 
             {/* INFORMACIÓN */}
             <div className="flex flex-col justify-center">
