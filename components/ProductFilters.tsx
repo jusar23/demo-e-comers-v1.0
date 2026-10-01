@@ -1,52 +1,44 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-
 type ProductFiltersProps = {
   categories: string[];
   brands: string[];
+
+  search: string;
+  category: string;
+  brand: string;
+  sort: string;
+
+  onSearchChange: (value: string) => void;
+  onCategoryChange: (value: string) => void;
+  onBrandChange: (value: string) => void;
+  onSortChange: (value: string) => void;
+  onClear: () => void;
 };
 
 export default function ProductFilters({
   categories,
   brands,
+  search,
+  category,
+  brand,
+  sort,
+  onSearchChange,
+  onCategoryChange,
+  onBrandChange,
+  onSortChange,
+  onClear,
 }: ProductFiltersProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const search = searchParams.get("search") ?? "";
-  const category = searchParams.get("category") ?? "";
-  const brand = searchParams.get("brand") ?? "";
-  const sort = searchParams.get("sort") ?? "";
-
-  function updateFilter(
-    key: string,
-    value: string
-  ) {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-
-    router.push(`/?${params.toString()}`);
-  }
-
-  function clearFilters() {
-    router.push("/");
-  }
-
   return (
     <aside className="rounded-2xl border bg-white p-5 shadow-sm">
+
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-gray-900">
           Filtros
         </h2>
 
         <button
-          onClick={clearFilters}
+          onClick={onClear}
           className="text-xs font-medium text-blue-600 hover:underline"
         >
           Limpiar
@@ -54,7 +46,24 @@ export default function ProductFilters({
       </div>
 
       <div className="mt-6 space-y-5">
-        
+
+        {/* Buscar */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-gray-700">
+            Buscar
+          </label>
+
+          <input
+            type="text"
+            value={search}
+            onChange={(e) =>
+              onSearchChange(e.target.value)
+            }
+            placeholder="Nombre, referencia o marca..."
+            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+
         {/* Categoría */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-gray-700">
@@ -64,11 +73,13 @@ export default function ProductFilters({
           <select
             value={category}
             onChange={(e) =>
-              updateFilter("category", e.target.value)
+              onCategoryChange(e.target.value)
             }
             className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Todas las categorías</option>
+            <option value="">
+              Todas las categorías
+            </option>
 
             {categories.map((item) => (
               <option key={item} value={item}>
@@ -87,11 +98,13 @@ export default function ProductFilters({
           <select
             value={brand}
             onChange={(e) =>
-              updateFilter("brand", e.target.value)
+              onBrandChange(e.target.value)
             }
             className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Todas las marcas</option>
+            <option value="">
+              Todas las marcas
+            </option>
 
             {brands.map((item) => (
               <option key={item} value={item}>
@@ -110,22 +123,28 @@ export default function ProductFilters({
           <select
             value={sort}
             onChange={(e) =>
-              updateFilter("sort", e.target.value)
+              onSortChange(e.target.value)
             }
             className="w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm text-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Más recientes</option>
+            <option value="">
+              Más recientes
+            </option>
+
             <option value="price-asc">
               Precio: menor a mayor
             </option>
+
             <option value="price-desc">
               Precio: mayor a menor
             </option>
+
             <option value="name-asc">
               Nombre: A-Z
             </option>
           </select>
         </div>
+
       </div>
     </aside>
   );
