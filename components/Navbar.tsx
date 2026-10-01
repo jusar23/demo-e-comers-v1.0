@@ -64,7 +64,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/#productos"
+              href="/repuestos"
               className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
               Repuestos
