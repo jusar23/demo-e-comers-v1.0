@@ -83,12 +83,11 @@ export default function Navbar() {
             >
               Motos
             </Link>
-
             <Link
-              href="/promociones"
+              href="/sobre-nosotros"
               className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
-              Promociones
+              Sobre nosotros
             </Link>
 
           </nav>

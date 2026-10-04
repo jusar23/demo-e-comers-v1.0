@@ -9,31 +9,30 @@ datasource db {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String
-  slug        String   @unique
-  reference   String   @unique
+  slug        String         @unique
+  reference   String         @unique
   description String
-  price       Decimal  @db.Decimal(10, 2)
-  stock       Int      @default(0)
+  price       Decimal        @db.Decimal(10, 2)
+  stock       Int            @default(0)
   brand       String
   category    String
   image       String?
-  images      String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  images      ProductImage[]
 }
 
 model Motocarro {
-  id              Int      @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   brand           String
   model           String
-  slug            String   @unique
+  slug            String           @unique
   description     String?
-  price           Decimal? @db.Decimal(12, 2)
-  stock           Int      @default(0)
+  price           Decimal?         @db.Decimal(12, 2)
+  stock           Int              @default(0)
   engineType      String?
-  refrigeration   String?
   displacement    Int?
   horsepower      Decimal?
   maxTorque       Decimal?
@@ -49,9 +48,10 @@ model Motocarro {
   tires           String?
   equipment       String?
   image           String?
-  images          String[] @default([])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  refrigeration   String?
+  images          MotocarroImage[]
 }
 
 model Moto {
@@ -60,14 +60,10 @@ model Moto {
   model             String
   slug              String      @unique
   description       String?
-
-  // Información comercial
   price             Decimal?    @db.Decimal(12, 2)
   stock             Int         @default(0)
   warrantyYears     Int?
   colors            String[]    @default([])
-
-  // Motor y rendimiento
   engineType        String?
   displacement      Decimal?    @db.Decimal(8, 2)
   horsepower        Decimal?    @db.Decimal(8, 2)
@@ -79,33 +75,24 @@ model Moto {
   ignition          String?
   transmission      String?
   fuelCapacity      Decimal?    @db.Decimal(8, 2)
-
-  // Dimensiones y peso
   lengthMm          Int?
   widthMm           Int?
   heightMm          Int?
   seatHeightMm      Int?
   groundClearanceMm Int?
   weightKg          Decimal?    @db.Decimal(8, 2)
-
-  // Parte ciclo
   frontSuspension   String?
   rearSuspension    String?
   frontBrake        String?
   rearBrake         String?
   frontWheel        String?
   rearWheel         String?
-
-  // Equipamiento y certificaciones
   equipment         String?
   certifications    String?
-
-  // Imagen principal y galería
   image             String?
-  images            MotoImage[]
-
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+  images            MotoImage[]
 }
 
 model MotoImage {
@@ -113,11 +100,66 @@ model MotoImage {
   url       String
   alt       String?
   position  Int      @default(0)
-
   motoId    Int
+  createdAt DateTime @default(now())
   moto      Moto     @relation(fields: [motoId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-
   @@index([motoId, position])
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  alt       String?
+  position  Int      @default(0)
+  productId Int
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, position])
+}
+
+model MotocarroImage {
+  id          Int       @id @default(autoincrement())
+  url         String
+  alt         String?
+  position    Int       @default(0)
+  motocarroId Int
+  createdAt   DateTime  @default(now())
+  motocarro   Motocarro @relation(fields: [motocarroId], references: [id], onDelete: Cascade)
+
+  @@index([motocarroId, position])
+}
+
+model CompanyBranch {
+  id        Int      @id @default(autoincrement())
+  name      String
+  city      String
+  address   String
+  phone     String?
+  whatsapp  String?
+  email     String?
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  active    Boolean  @default(true)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([city])
+  @@index([active, position])
+}
+
+model GalleryImage {
+  id          Int      @id @default(autoincrement())
+  title       String?
+  description String?
+  url         String
+  alt         String?
+  position    Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, position])
 }
