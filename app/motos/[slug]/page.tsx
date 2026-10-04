@@ -69,10 +69,7 @@ export default async function MotoDetailPage({
         ? `${Number(moto.fuelCapacity)} L`
         : null,
     ],
-    [
-      "Relación de compresión",
-      moto.compressionRatio,
-    ],
+    ["Relación de compresión", moto.compressionRatio],
     [
       "Largo",
       moto.lengthMm != null
@@ -125,15 +122,27 @@ export default async function MotoDetailPage({
     ],
   ] as const;
 
-  const gallery = [
-    ...(moto.image ? [moto.image] : []),
-    ...moto.images.map((image) => image.url),
+  const galleryImages = [
+    ...(moto.image
+      ? [
+          {
+            url: moto.image,
+            alt: `${moto.brand} ${moto.model}`,
+          },
+        ]
+      : []),
+    ...moto.images.map((image) => ({
+      url: image.url,
+      alt: image.alt,
+    })),
   ].filter(
-    (url, index, all) => all.indexOf(url) === index
+    (image, index, all) =>
+      all.findIndex((item) => item.url === image.url) === index
   );
 
   return (
     <main className="min-h-screen bg-white">
+      {/* Navegación */}
       <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
         <nav className="mx-auto max-w-7xl text-sm text-gray-500">
           <Link href="/" className="hover:text-blue-900">
@@ -150,38 +159,27 @@ export default async function MotoDetailPage({
         </nav>
       </div>
 
+      {/* Presentación del modelo */}
       <section className="bg-[#080A12] px-6 py-12 text-white sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-2">
-          <div>
-            <div className="flex min-h-[300px] items-center justify-center overflow-hidden rounded-2xl bg-white sm:min-h-[430px]">
-              {gallery.length > 0 ? (
-                <MotoGallery
-                  images={gallery}
-                  model={moto.model}
-                />
-              ) : (
-                <div className="p-8 text-center text-gray-700">
-                  <div className="text-7xl">🏍️</div>
-                  <p className="mt-4 font-semibold">
-                    Fotografías próximamente
-                  </p>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {moto.brand} {moto.model}
-                  </p>
-                </div>
-              )}
-            </div>
+          {/* Galería de imágenes */}
+          <div className="min-w-0">
+            <ImageGallery
+              alt={`${moto.brand} ${moto.model}`}
+              images={galleryImages}
+            />
 
             {moto.colors.length > 0 && (
               <div className="mt-5">
                 <p className="text-sm font-semibold text-gray-300">
                   Colores registrados
                 </p>
+
                 <div className="mt-2 flex flex-wrap gap-2">
                   {moto.colors.map((color) => (
                     <span
                       key={color}
-                      className="rounded-full border border-white/20 px-3 py-1.5 text-sm"
+                      className="rounded-full border border-white/20 px-3 py-1.5 text-sm text-white"
                     >
                       {color}
                     </span>
@@ -191,6 +189,7 @@ export default async function MotoDetailPage({
             )}
           </div>
 
+          {/* Información principal */}
           <div className="flex flex-col justify-center">
             <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-300">
               {moto.brand} Motorcycles
@@ -214,6 +213,7 @@ export default async function MotoDetailPage({
                     : "Por confirmar"
                 }
               />
+
               <Highlight
                 label="Potencia"
                 value={
@@ -222,10 +222,12 @@ export default async function MotoDetailPage({
                     : "Por confirmar"
                 }
               />
+
               <Highlight
                 label="Transmisión"
                 value={moto.transmission ?? "Por confirmar"}
               />
+
               <Highlight
                 label="Garantía"
                 value={
@@ -251,23 +253,28 @@ export default async function MotoDetailPage({
         </div>
       </section>
 
+      {/* Ficha técnica */}
       <section className="px-6 py-14 sm:py-16">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm font-bold uppercase tracking-wider text-[#17266F]">
             Información del modelo
           </p>
+
           <h2 className="mt-2 text-3xl font-black text-gray-950">
             Ficha técnica
           </h2>
+
           <p className="mt-3 text-sm leading-6 text-gray-500">
             Se muestran las especificaciones registradas para
-            este modelo. Los datos no disponibles se dejan
+            este modelo. Los datos no disponibles quedan
             pendientes de confirmar.
           </p>
 
           <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200">
             {specs
-              .filter(([, value]) => value != null && value !== "")
+              .filter(
+                ([, value]) => value != null && value !== ""
+              )
               .map(([label, value]) => (
                 <div
                   key={label}
@@ -276,6 +283,7 @@ export default async function MotoDetailPage({
                   <p className="text-sm font-semibold text-gray-500">
                     {label}
                   </p>
+
                   <p className="text-sm font-medium text-gray-900">
                     {value}
                   </p>
@@ -285,6 +293,7 @@ export default async function MotoDetailPage({
         </div>
       </section>
 
+      {/* Contacto */}
       <section
         id="contacto"
         className="scroll-mt-24 bg-gray-50 px-6 py-14"
@@ -293,17 +302,20 @@ export default async function MotoDetailPage({
           <h2 className="text-2xl font-black text-gray-950">
             ¿Te interesa la {moto.model}?
           </h2>
+
           <p className="mt-3 leading-7 text-gray-600">
             Contacta a un asesor para consultar precio,
             disponibilidad, colores y condiciones comerciales.
           </p>
+
           <p className="mt-5 text-sm text-gray-500">
             El canal de contacto se habilitará cuando se
             configuren los datos comerciales de la tienda.
           </p>
+
           <Link
             href="/motos"
-            className="mt-6 inline-flex rounded-xl bg-[#17266F] px-5 py-3 text-sm font-bold text-white hover:bg-[#10194B]"
+            className="mt-6 inline-flex rounded-xl bg-[#17266F] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#10194B]"
           >
             Volver al catálogo
           </Link>
@@ -323,42 +335,9 @@ function Highlight({
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-4">
       <p className="text-xs text-gray-400">{label}</p>
+
       <p className="mt-2 line-clamp-2 font-bold text-white">
         {value}
-      </p>
-    </div>
-  );
-}
-
-function MotoGallery({
-  images,
-  model,
-}: {
-  images: string[];
-  model: string;
-}) {
-  return (
-    <div className="w-full p-4">
-      <div className="flex gap-3 overflow-x-auto">
-        {images.map((src, index) => (
-          <a
-            key={`${src}-${index}`}
-            href={src}
-            target="_blank"
-            rel="noreferrer"
-            className="shrink-0"
-            aria-label={`Abrir imagen ${index + 1} de ${model}`}
-          >
-            <img
-              src={src}
-              alt={`${model}, fotografía ${index + 1}`}
-              className="h-64 w-64 rounded-xl object-contain sm:h-80 sm:w-80"
-            />
-          </a>
-        ))}
-      </div>
-      <p className="mt-3 text-center text-xs text-gray-500">
-        Selecciona una fotografía para abrirla en tamaño completo.
       </p>
     </div>
   );

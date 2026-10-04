@@ -16,15 +16,18 @@ export default async function MotocarroDetailPage({
   const { slug } = await params;
 
   const motocarro = await prisma.motocarro.findUnique({
-    where: {
-      slug,
+    where: { slug },
+    include: {
+      images: {
+        orderBy: { position: "asc" },
+      },
     },
   });
 
   if (!motocarro) {
     notFound();
   }
-  
+
   const price = motocarro.price
     ? Number(motocarro.price)
     : null;
@@ -76,13 +79,12 @@ export default async function MotocarroDetailPage({
 
           <div className="grid gap-10 lg:grid-cols-2">
 
-           {/* GALERÍA */}
-              <MotocarroGallery
-                images={motocarro.images}
-                fallbackImage={motocarro.image}
-                name={`${motocarro.brand} ${motocarro.model}`}
-              />
-
+            {/* GALERÍA */}
+            <MotocarroGallery
+              images={motocarro.images.map((image) => image.url)}
+              fallbackImage={motocarro.image}
+              name={`${motocarro.brand} ${motocarro.model}`}
+            />
 
             {/* INFORMACIÓN */}
             <div className="flex flex-col justify-center">
@@ -129,6 +131,7 @@ export default async function MotocarroDetailPage({
               {/* DATOS DESTACADOS */}
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
 
+                {/* CILINDRAJE */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
 
                   <p className="text-xs text-gray-500">
@@ -143,6 +146,7 @@ export default async function MotocarroDetailPage({
 
                 </div>
 
+                {/* POTENCIA */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
 
                   <p className="text-xs text-gray-500">
@@ -157,6 +161,7 @@ export default async function MotocarroDetailPage({
 
                 </div>
 
+                {/* CARGA */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
 
                   <p className="text-xs text-gray-500">
@@ -235,7 +240,7 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Cilindraje"
                   value={
-                    motocarro.displacement
+                    motocarro.displacement !== null
                       ? `${motocarro.displacement} cc`
                       : null
                   }
@@ -254,9 +259,7 @@ export default async function MotocarroDetailPage({
                   label="Torque máximo"
                   value={
                     motocarro.maxTorque
-                      ? `${Number(
-                          motocarro.maxTorque
-                        )} Nm`
+                      ? `${Number(motocarro.maxTorque)} Nm`
                       : null
                   }
                 />
@@ -291,9 +294,7 @@ export default async function MotocarroDetailPage({
                   label="Capacidad del tanque"
                   value={
                     motocarro.fuelTank
-                      ? `${Number(
-                          motocarro.fuelTank
-                        )} galones`
+                      ? `${Number(motocarro.fuelTank)} galones`
                       : null
                   }
                 />
@@ -330,6 +331,7 @@ export default async function MotocarroDetailPage({
 
               </div>
 
+              {/* EQUIPAMIENTO */}
               {motocarro.equipment && (
                 <div className="border-t border-gray-200 p-6">
 
@@ -355,6 +357,10 @@ export default async function MotocarroDetailPage({
     </main>
   );
 }
+
+/* =========================================================
+   COMPONENTE FILA TÉCNICA
+   ========================================================= */
 
 function TechnicalRow({
   label,

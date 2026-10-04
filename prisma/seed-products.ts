@@ -310,6 +310,7 @@ async function main() {
       where: {
         slug: product.slug,
       },
+
       update: {
         name: product.name,
         reference: product.reference,
@@ -319,8 +320,21 @@ async function main() {
         brand: product.brand,
         category: product.category,
         image: product.image,
-        images: product.image ? [product.image] : [],
+
+        // Actualizamos las imágenes relacionadas
+        images: {
+          deleteMany: {},
+          create: product.image
+            ? [
+                {
+                  url: product.image,
+                  position: 0,
+                },
+              ]
+            : [],
+        },
       },
+
       create: {
         name: product.name,
         slug: product.slug,
@@ -331,7 +345,18 @@ async function main() {
         brand: product.brand,
         category: product.category,
         image: product.image,
-        images: product.image ? [product.image] : [],
+
+        // Creamos las imágenes relacionadas
+        images: {
+          create: product.image
+            ? [
+                {
+                  url: product.image,
+                  position: 0,
+                },
+              ]
+            : [],
+        },
       },
     });
 
