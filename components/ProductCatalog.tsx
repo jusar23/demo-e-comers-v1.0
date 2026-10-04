@@ -22,15 +22,17 @@ type ProductCatalogProps = {
   products: Product[];
   categories: string[];
   brands: string[];
+  initialCategory?: string;
 };
 
 export default function ProductCatalog({
   products,
   categories,
   brands,
+  initialCategory = "",
 }: ProductCatalogProps) {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(initialCategory);
   const [brand, setBrand] = useState("");
   const [sort, setSort] = useState("");
 
@@ -39,7 +41,7 @@ export default function ProductCatalog({
 
     // Buscar por nombre, referencia o marca
     if (search.trim()) {
-      const searchValue = search.toLowerCase();
+      const searchValue = search.toLowerCase().trim();
 
       result = result.filter(
         (product) =>
@@ -69,16 +71,12 @@ export default function ProductCatalog({
 
     // Precio menor a mayor
     if (sort === "price-asc") {
-      result.sort(
-        (a, b) => a.price - b.price
-      );
+      result.sort((a, b) => a.price - b.price);
     }
 
     // Precio mayor a menor
     if (sort === "price-desc") {
-      result.sort(
-        (a, b) => b.price - a.price
-      );
+      result.sort((a, b) => b.price - a.price);
     }
 
     // Nombre A-Z
@@ -141,7 +139,9 @@ export default function ProductCatalog({
 
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              Todos los repuestos
+              {category
+                ? `Repuestos de ${category}`
+                : "Todos los repuestos"}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">

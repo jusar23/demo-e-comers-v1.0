@@ -1,7 +1,18 @@
 import { prisma } from "@/lib/prisma";
-import ProductCatalog from "@/components/ProductCatalog"
+import ProductCatalog from "@/components/ProductCatalog";
 
-export default async function RepuestosPage() {
+type RepuestosPageProps = {
+  searchParams: Promise<{
+    categoria?: string;
+  }>;
+};
+
+export default async function RepuestosPage({
+  searchParams,
+}: RepuestosPageProps) {
+  const params = await searchParams;
+  const categoriaInicial = params.categoria ?? "";
+
   const products = await prisma.product.findMany({
     orderBy: {
       createdAt: "desc",
@@ -43,10 +54,8 @@ export default async function RepuestosPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-
       <section className="bg-gray-900 px-6 py-14">
         <div className="mx-auto max-w-7xl">
-
           <p className="text-sm font-bold uppercase tracking-wider text-blue-400">
             Catálogo de repuestos
           </p>
@@ -60,20 +69,17 @@ export default async function RepuestosPage() {
             Utiliza el buscador y los filtros para encontrar
             rápidamente la referencia que necesitas.
           </p>
-
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">
-
         <ProductCatalog
           products={formattedProducts}
           categories={categories}
           brands={brands}
+          initialCategory={categoriaInicial}
         />
-
       </section>
-
     </main>
   );
 }
