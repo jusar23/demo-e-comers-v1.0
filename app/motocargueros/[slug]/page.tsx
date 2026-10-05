@@ -1,8 +1,8 @@
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-
-import MotocarroGallery from "@/components/MotocarroGallery";
+import ImageGallery from "@/components/ImageGallery";
 
 type MotocarroDetailPageProps = {
   params: Promise<{
@@ -28,23 +28,40 @@ export default async function MotocarroDetailPage({
     notFound();
   }
 
-  const price = motocarro.price
-    ? Number(motocarro.price)
-    : null;
+  const price =
+    motocarro.price != null
+      ? Number(motocarro.price)
+      : null;
 
-  const horsepower = motocarro.horsepower
-    ? Number(motocarro.horsepower)
-    : null;
+  const horsepower =
+    motocarro.horsepower != null
+      ? Number(motocarro.horsepower)
+      : null;
+
+  const galleryImages = [
+    ...(motocarro.image
+      ? [
+          {
+            url: motocarro.image,
+            alt: `${motocarro.brand} ${motocarro.model}`,
+          },
+        ]
+      : []),
+    ...motocarro.images.map((image) => ({
+      url: image.url,
+      alt: image.alt,
+    })),
+  ].filter(
+    (image, index, all) =>
+      all.findIndex((item) => item.url === image.url) === index
+  );
 
   return (
     <main className="min-h-screen bg-gray-50">
-
       {/* MIGAS DE NAVEGACIÓN */}
       <div className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-4">
-
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-
+          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
             <Link
               href="/"
               className="transition hover:text-blue-600"
@@ -66,29 +83,24 @@ export default async function MotocarroDetailPage({
             <span className="font-medium text-gray-900">
               {motocarro.model}
             </span>
-
           </div>
-
         </div>
       </div>
 
       {/* INFORMACIÓN PRINCIPAL */}
       <section className="px-6 py-10 sm:py-14">
-
         <div className="mx-auto max-w-7xl">
+          <div className="grid min-w-0 gap-10 lg:grid-cols-2">
+            {/* GALERÍA INTERACTIVA */}
+            <div className="min-w-0">
+              <ImageGallery
+                images={galleryImages}
+                alt={`${motocarro.brand} ${motocarro.model}`}
+              />
+            </div>
 
-          <div className="grid gap-10 lg:grid-cols-2">
-
-            {/* GALERÍA */}
-            <MotocarroGallery
-              images={motocarro.images.map((image) => image.url)}
-              fallbackImage={motocarro.image}
-              name={`${motocarro.brand} ${motocarro.model}`}
-            />
-
-            {/* INFORMACIÓN */}
+            {/* INFORMACIÓN DEL MOTOCARGUERO */}
             <div className="flex flex-col justify-center">
-
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-600">
                 Motocarguero
               </p>
@@ -105,19 +117,23 @@ export default async function MotocarroDetailPage({
 
               {/* PRECIO */}
               <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5">
-
-                {price ? (
+                {price != null ? (
                   <>
                     <p className="text-sm text-gray-500">
                       Precio
                     </p>
 
                     <p className="mt-1 text-3xl font-extrabold text-gray-900">
-                      ${price.toLocaleString("es-CO")}
+                      {price.toLocaleString("es-CO", {
+                        style: "currency",
+                        currency: "COP",
+                        maximumFractionDigits: 0,
+                      })}
                     </p>
 
                     <p className="mt-1 text-xs text-gray-500">
-                      Precio de referencia en pesos colombianos
+                      Precio de referencia en pesos colombianos.
+                      Consulta las condiciones comerciales.
                     </p>
                   </>
                 ) : (
@@ -125,64 +141,51 @@ export default async function MotocarroDetailPage({
                     Consultar precio
                   </p>
                 )}
-
               </div>
 
               {/* DATOS DESTACADOS */}
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-
-                {/* CILINDRAJE */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
-
                   <p className="text-xs text-gray-500">
                     Cilindraje
                   </p>
 
                   <p className="mt-1 font-bold text-gray-900">
-                    {motocarro.displacement
-                      ? `${motocarro.displacement} cc`
-                      : "—"}
+                    {motocarro.displacement != null
+                      ? `${Number(motocarro.displacement)} cc`
+                      : "Por confirmar"}
                   </p>
-
                 </div>
 
-                {/* POTENCIA */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
-
                   <p className="text-xs text-gray-500">
                     Potencia
                   </p>
 
                   <p className="mt-1 font-bold text-gray-900">
-                    {horsepower
+                    {horsepower != null
                       ? `${horsepower} HP`
-                      : "—"}
+                      : "Por confirmar"}
                   </p>
-
                 </div>
 
-                {/* CARGA */}
                 <div className="rounded-2xl bg-white p-4 shadow-sm">
-
                   <p className="text-xs text-gray-500">
-                    Carga
+                    Capacidad de carga
                   </p>
 
                   <p className="mt-1 font-bold text-gray-900">
-                    {motocarro.loadCapacity
+                    {motocarro.loadCapacity != null
                       ? `${motocarro.loadCapacity.toLocaleString(
                           "es-CO"
                         )} kg`
-                      : "—"}
+                      : "Por confirmar"}
                   </p>
-
                 </div>
-
               </div>
 
               {/* BOTONES */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-
                 <Link
                   href="/#contacto"
                   className="flex-1 rounded-xl bg-blue-600 px-6 py-4 text-center text-sm font-bold text-white transition hover:bg-blue-700"
@@ -196,18 +199,13 @@ export default async function MotocarroDetailPage({
                 >
                   Ver otros modelos
                 </Link>
-
               </div>
-
             </div>
-
           </div>
 
           {/* FICHA TÉCNICA */}
           <section className="mt-14">
-
             <div className="mb-7">
-
               <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
                 Especificaciones
               </p>
@@ -216,12 +214,15 @@ export default async function MotocarroDetailPage({
                 Ficha técnica
               </h2>
 
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-gray-500">
+                Consulta las características registradas para
+                este modelo. Los datos que todavía no se han
+                registrado aparecen como no especificados.
+              </p>
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-
               <div className="grid md:grid-cols-2">
-
                 <TechnicalRow
                   label="Marca"
                   value={motocarro.brand}
@@ -240,8 +241,8 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Cilindraje"
                   value={
-                    motocarro.displacement !== null
-                      ? `${motocarro.displacement} cc`
+                    motocarro.displacement != null
+                      ? `${Number(motocarro.displacement)} cc`
                       : null
                   }
                 />
@@ -249,7 +250,7 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Potencia"
                   value={
-                    horsepower
+                    horsepower != null
                       ? `${horsepower} HP`
                       : null
                   }
@@ -258,7 +259,7 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Torque máximo"
                   value={
-                    motocarro.maxTorque
+                    motocarro.maxTorque != null
                       ? `${Number(motocarro.maxTorque)} Nm`
                       : null
                   }
@@ -282,7 +283,7 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Capacidad de carga"
                   value={
-                    motocarro.loadCapacity
+                    motocarro.loadCapacity != null
                       ? `${motocarro.loadCapacity.toLocaleString(
                           "es-CO"
                         )} kg`
@@ -293,7 +294,7 @@ export default async function MotocarroDetailPage({
                 <TechnicalRow
                   label="Capacidad del tanque"
                   value={
-                    motocarro.fuelTank
+                    motocarro.fuelTank != null
                       ? `${Number(motocarro.fuelTank)} galones`
                       : null
                   }
@@ -328,13 +329,11 @@ export default async function MotocarroDetailPage({
                   label="Llantas"
                   value={motocarro.tires}
                 />
-
               </div>
 
               {/* EQUIPAMIENTO */}
               {motocarro.equipment && (
                 <div className="border-t border-gray-200 p-6">
-
                   <p className="text-sm font-semibold text-gray-500">
                     Equipamiento
                   </p>
@@ -342,44 +341,34 @@ export default async function MotocarroDetailPage({
                   <p className="mt-2 leading-7 text-gray-800">
                     {motocarro.equipment}
                   </p>
-
                 </div>
               )}
-
             </div>
-
           </section>
-
         </div>
-
       </section>
-
     </main>
   );
 }
-
-/* =========================================================
-   COMPONENTE FILA TÉCNICA
-   ========================================================= */
 
 function TechnicalRow({
   label,
   value,
 }: {
   label: string;
-  value: string | null;
+  value: string | number | null;
 }) {
   return (
-    <div className="border-b border-gray-200 p-5 last:border-b-0">
-
+    <div className="border-b border-gray-200 p-5">
       <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
         {label}
       </p>
 
       <p className="mt-1 text-sm font-semibold text-gray-900">
-        {value || "No especificado"}
+        {value != null && value !== ""
+          ? value
+          : "No especificado"}
       </p>
-
     </div>
   );
 }

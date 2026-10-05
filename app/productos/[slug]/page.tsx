@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import ImageGallery from "@/components/ImageGallery";
 
 type ProductPageProps = {
   params: Promise<{
@@ -17,6 +18,13 @@ export default async function ProductPage({
     where: {
       slug,
     },
+    include: {
+      images: {
+        orderBy: {
+          position: "asc",
+        },
+      },
+    },
   });
 
   if (!product) {
@@ -25,10 +33,32 @@ export default async function ProductPage({
 
   const isAvailable = product.stock > 0;
 
+  // Combinar la imagen principal con las imágenes adicionales.
+  // Se eliminan las URLs repetidas para evitar duplicados en la galería.
+  const galleryImages = [
+    ...(product.image
+      ? [
+          {
+            url: product.image,
+            alt: product.name,
+          },
+        ]
+      : []),
+    ...product.images.map((image) => ({
+      url: image.url,
+      alt: image.alt || product.name,
+    })),
+  ].filter(
+    (image, index, images) =>
+      image.url.trim() !== "" &&
+      images.findIndex(
+        (item) => item.url === image.url
+      ) === index
+  );
+
   return (
     <main className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
-
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
@@ -38,31 +68,16 @@ export default async function ProductPage({
 
         <div className="overflow-hidden rounded-3xl border bg-white shadow-sm">
           <div className="grid md:grid-cols-2">
-
-            {/* Imagen */}
-            <div className="flex min-h-[450px] items-center justify-center bg-gray-100 p-8">
-              {product.image ? (
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="max-h-[500px] w-full rounded-2xl object-cover"
-                />
-              ) : (
-                <div className="text-center">
-                  <div className="text-7xl">
-                    🔧
-                  </div>
-
-                  <p className="mt-3 text-gray-400">
-                    Imagen no disponible
-                  </p>
-                </div>
-              )}
+            {/* Galería de imágenes */}
+            <div className="p-6 md:p-8">
+              <ImageGallery
+                images={galleryImages}
+                alt={product.name}
+              />
             </div>
 
-            {/* Información */}
+            {/* Información del repuesto */}
             <div className="p-8 md:p-12">
-
               <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
                 {product.category}
               </span>
@@ -89,9 +104,7 @@ export default async function ProductPage({
 
               <p className="text-4xl font-bold text-gray-900">
                 $
-                {Number(product.price).toLocaleString(
-                  "es-CO"
-                )}
+                {Number(product.price).toLocaleString("es-CO")}
               </p>
 
               <p className="mt-1 text-sm text-gray-500">
@@ -136,3 +149,4 @@ export default async function ProductPage({
     </main>
   );
 }
+

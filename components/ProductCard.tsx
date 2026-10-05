@@ -18,28 +18,31 @@ export default function ProductCard({
   product: Product;
 }) {
   const isAvailable = product.stock > 0;
+  const productUrl = `/productos/${product.slug}`;
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      
-      {/* Imagen */}
+      {/* Imagen principal */}
       <Link
-        href={`/productos/${product.slug}`}
+        href={productUrl}
         className="block"
+        aria-label={`Ver ${product.name}`}
       >
         <div className="relative flex h-60 items-center justify-center overflow-hidden bg-gray-100">
-          {product.image ? (
+          {product.image?.trim() ? (
             <img
               src={product.image}
               alt={product.name}
               loading="lazy"
-              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              className="h-full w-full object-contain p-3 transition duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="text-center">
-              <div className="text-5xl">🔧</div>
+            <div className="flex flex-col items-center justify-center text-center">
+              <span className="text-5xl" aria-hidden="true">
+                🔧
+              </span>
               <p className="mt-2 text-sm text-gray-400">
-                Sin imagen
+                Imagen próximamente
               </p>
             </div>
           )}
@@ -50,13 +53,13 @@ export default function ProductCard({
         </div>
       </Link>
 
-      {/* Información */}
+      {/* Información del repuesto */}
       <div className="p-5">
         <p className="text-sm font-medium text-blue-600">
           {product.brand}
         </p>
 
-        <Link href={`/productos/${product.slug}`}>
+        <Link href={productUrl}>
           <h2 className="mt-1 line-clamp-2 min-h-14 text-lg font-bold text-gray-900 transition hover:text-blue-600">
             {product.name}
           </h2>
@@ -67,9 +70,10 @@ export default function ProductCard({
         </p>
 
         <div className="mt-4 flex items-end justify-between gap-3">
-          <div>
+          <div className="min-w-0">
             <p className="text-2xl font-bold text-gray-900">
-              ${Number(product.price).toLocaleString("es-CO")}
+              $
+              {Number(product.price).toLocaleString("es-CO")}
             </p>
 
             <p className="text-xs text-gray-500">
@@ -78,18 +82,18 @@ export default function ProductCard({
           </div>
 
           {isAvailable ? (
-            <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+            <span className="shrink-0 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
               Disponible
             </span>
           ) : (
-            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+            <span className="shrink-0 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
               Agotado
             </span>
           )}
         </div>
 
         <Link
-          href={`/productos/${product.slug}`}
+          href={productUrl}
           className="mt-5 block rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700"
         >
           Ver producto
@@ -98,3 +102,4 @@ export default function ProductCard({
     </article>
   );
 }
+
