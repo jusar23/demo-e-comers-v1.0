@@ -12,180 +12,282 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-white/95 backdrop-blur">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6">
 
-        {/* =========================
+        {/* =====================================================
             NAVBAR PRINCIPAL
-        ========================== */}
-        <div className="flex h-16 items-center justify-between gap-3">
+        ====================================================== */}
+        <div className="flex h-[64px] items-center gap-2 sm:h-[72px] sm:gap-4">
 
-          {/* Botón menú móvil */}
+          {/* =========================
+              MENÚ MÓVIL
+          ========================== */}
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 text-xl text-gray-700 transition hover:bg-gray-50 md:hidden"
-            aria-label="Abrir menú"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl text-gray-700 shadow-sm transition active:scale-95 hover:bg-gray-50 md:hidden"
+            aria-label={
+              menuOpen ? "Cerrar menú" : "Abrir menú"
+            }
+            aria-expanded={menuOpen}
           >
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* Logo */}
+          {/* =========================
+              LOGO
+          ========================== */}
           <Link
             href="/"
             onClick={closeMenu}
-            className="flex shrink-0 items-center gap-2"
+            className="flex min-w-0 shrink-0 items-center gap-2"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-xl">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-xl shadow-sm sm:h-11 sm:w-11">
               🚚
             </div>
 
-            <div>
-              <p className="text-base font-bold leading-none text-gray-900 sm:text-lg">
+            <div className="min-w-0">
+              <p className="truncate text-sm font-extrabold leading-tight text-gray-900 sm:text-lg">
                 Repuestos
               </p>
 
-              <p className="hidden text-xs text-gray-500 sm:block">
+              <p className="hidden text-[11px] leading-tight text-gray-500 sm:block">
                 Tu tienda de confianza
               </p>
             </div>
           </Link>
 
           {/* =========================
-              MENÚ PC
+              MENÚ DESKTOP
           ========================== */}
-          <nav className="hidden items-center gap-6 md:flex">
-
+          <nav className="ml-3 hidden items-center gap-5 lg:ml-6 lg:gap-6 md:flex">
             <Link
               href="/"
-              className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
+              className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
               Inicio
             </Link>
 
             <Link
               href="/repuestos"
-              className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
+              className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
               Repuestos
             </Link>
 
             <Link
               href="/motocargueros"
-              className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
+              className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
               Motocargueros
             </Link>
 
             <Link
               href="/motos"
-              className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
+              className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
               Motos
             </Link>
+
             <Link
               href="/sobre-nosotros"
-              className="text-sm font-medium text-gray-700 transition hover:text-blue-600"
+              className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
             >
-              Sobre nosotros
+              Nosotros
             </Link>
-
           </nav>
 
           {/* =========================
-              BUSCADOR PC
+              BUSCADOR DESKTOP
           ========================== */}
-          <div className="hidden flex-1 md:block md:max-w-md">
+          <div className="ml-auto hidden min-w-0 flex-1 md:block md:max-w-md lg:max-w-lg">
             <Suspense fallback={null}>
-    <SearchBar />
-  </Suspense>
-</div>
+              <SearchBar />
+            </Suspense>
+          </div>
 
           {/* =========================
               CARRITO
           ========================== */}
           <button
             type="button"
-            className="shrink-0 rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="flex h-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white px-3 text-lg text-gray-700 shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 sm:px-4"
+            aria-label="Abrir carrito"
           >
-            🛒 <span className="hidden sm:inline">Carrito</span>
+            <span aria-hidden="true">🛒</span>
+            <span className="ml-2 hidden text-sm font-semibold sm:inline">
+              Carrito
+            </span>
           </button>
         </div>
 
-        {/* =========================
+        {/* =====================================================
             BUSCADOR MÓVIL
-        ========================== */}
+        ====================================================== */}
         <div className="pb-3 md:hidden">
           <Suspense fallback={null}>
             <SearchBar />
-          </Suspense>           
+          </Suspense>
         </div>
 
-        {/* =========================
+        {/* =====================================================
             MENÚ MÓVIL
-        ========================== */}
-        {menuOpen && (
-          <div className="border-t border-gray-100 py-3 md:hidden">
+        ====================================================== */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
+            menuOpen
+              ? "max-h-[520px] border-t border-gray-100 opacity-100"
+              : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="py-3">
 
-            <nav className="flex flex-col">
+            {/* Encabezado del menú */}
+            <div className="mb-2 flex items-center justify-between px-2">
+              <div>
+                <p className="text-sm font-bold text-gray-900">
+                  Menú
+                </p>
 
+                <p className="text-xs text-gray-500">
+                  Explora nuestra tienda
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeMenu}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Cerrar menú"
+              >
+                ✕
+              </button>
+            </div>
+
+            <nav className="grid gap-1">
+
+              {/* Inicio */}
               <Link
                 href="/"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">🏠</span>
-                Inicio
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-lg">
+                  🏠
+                </span>
+
+                <span>Inicio</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
               </Link>
 
+              {/* Repuestos */}
               <Link
-                href="/#productos"
+                href="/repuestos"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">🔧</span>
-                Repuestos
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-lg">
+                  🔧
+                </span>
+
+                <span>Repuestos</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
               </Link>
 
+              {/* Motocargueros */}
               <Link
                 href="/motocargueros"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">🚚</span>
-                Motocargueros
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-lg">
+                  🚚
+                </span>
+
+                <span>Motocargueros</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
               </Link>
 
+              {/* Motos */}
               <Link
                 href="/motos"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">🏍️</span>
-                Motos
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-lg">
+                  🏍️
+                </span>
+
+                <span>Motos</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
               </Link>
 
+              {/* Promociones */}
               <Link
                 href="/promociones"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">🔥</span>
-                Promociones
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-lg">
+                  🔥
+                </span>
+
+                <span>Promociones</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
               </Link>
 
+              {/* Sobre nosotros */}
+              <Link
+                href="/sobre-nosotros"
+                onClick={closeMenu}
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-lg">
+                  ℹ️
+                </span>
+
+                <span>Sobre nosotros</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
+              </Link>
+
+              {/* Contacto */}
               <Link
                 href="/#contacto"
                 onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
               >
-                <span className="text-lg">📞</span>
-                Contacto
-              </Link>
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-lg">
+                  📞
+                </span>
 
+                <span>Contacto</span>
+
+                <span className="ml-auto text-gray-300">
+                  →
+                </span>
+              </Link>
             </nav>
           </div>
-        )}
+        </div>
       </div>
     </header>
   );
