@@ -23,6 +23,7 @@ type ProductCatalogProps = {
   categories: string[];
   brands: string[];
   initialCategory?: string;
+  initialSearch?: string;
 };
 
 export default function ProductCatalog({
@@ -30,8 +31,9 @@ export default function ProductCatalog({
   categories,
   brands,
   initialCategory = "",
+  initialSearch = "",
 }: ProductCatalogProps) {
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCategory);
   const [brand, setBrand] = useState("");
   const [sort, setSort] = useState("");
@@ -39,7 +41,13 @@ export default function ProductCatalog({
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Buscar por nombre, referencia o marca
+    /*
+     * Buscar por:
+     * - nombre
+     * - referencia
+     * - marca
+     * - categoría
+     */
     if (search.trim()) {
       const searchValue = search.toLowerCase().trim();
 
@@ -47,11 +55,14 @@ export default function ProductCatalog({
         (product) =>
           product.name.toLowerCase().includes(searchValue) ||
           product.reference.toLowerCase().includes(searchValue) ||
-          product.brand.toLowerCase().includes(searchValue)
+          product.brand.toLowerCase().includes(searchValue) ||
+          product.category.toLowerCase().includes(searchValue)
       );
     }
 
-    // Filtrar por categoría
+    /*
+     * Filtrar por categoría
+     */
     if (category) {
       result = result.filter(
         (product) =>
@@ -60,7 +71,9 @@ export default function ProductCatalog({
       );
     }
 
-    // Filtrar por marca
+    /*
+     * Filtrar por marca
+     */
     if (brand) {
       result = result.filter(
         (product) =>
@@ -69,24 +82,32 @@ export default function ProductCatalog({
       );
     }
 
-    // Precio menor a mayor
+    /*
+     * Ordenar por precio menor a mayor
+     */
     if (sort === "price-asc") {
       result.sort((a, b) => a.price - b.price);
     }
 
-    // Precio mayor a menor
+    /*
+     * Ordenar por precio mayor a menor
+     */
     if (sort === "price-desc") {
       result.sort((a, b) => b.price - a.price);
     }
 
-    // Nombre A-Z
+    /*
+     * Ordenar por nombre
+     */
     if (sort === "name-asc") {
       result.sort((a, b) =>
         a.name.localeCompare(b.name)
       );
     }
 
-    // Más recientes
+    /*
+     * Más recientes
+     */
     if (!sort) {
       result.sort(
         (a, b) =>
@@ -113,7 +134,6 @@ export default function ProductCatalog({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-
       {/* Filtros */}
       <aside>
         <ProductFilters
@@ -133,15 +153,15 @@ export default function ProductCatalog({
 
       {/* Productos */}
       <div>
-
         {/* Encabezado */}
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              {category
-                ? `Repuestos de ${category}`
-                : "Todos los repuestos"}
+              {search
+                ? `Resultados para "${search}"`
+                : category
+                  ? `Repuestos de ${category}`
+                  : "Todos los repuestos"}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
@@ -160,13 +180,11 @@ export default function ProductCatalog({
               Limpiar filtros
             </button>
           )}
-
         </div>
 
         {/* Sin resultados */}
         {filteredProducts.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
-
             <div className="text-5xl">
               🔍
             </div>
@@ -176,8 +194,8 @@ export default function ProductCatalog({
             </h3>
 
             <p className="mt-2 text-gray-500">
-              Intenta buscar con otro término o cambiar
-              los filtros.
+              No encontramos repuestos que coincidan
+              con "{search}".
             </p>
 
             <button
@@ -186,25 +204,19 @@ export default function ProductCatalog({
             >
               Ver todos los repuestos
             </button>
-
           </div>
         ) : (
-
           /* Cards */
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
               />
             ))}
-
           </div>
         )}
-
       </div>
-
     </div>
   );
 }

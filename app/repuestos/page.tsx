@@ -3,6 +3,7 @@ import ProductCatalog from "@/components/ProductCatalog";
 
 type RepuestosPageProps = {
   searchParams: Promise<{
+    search?: string;
     categoria?: string;
   }>;
 };
@@ -11,6 +12,8 @@ export default async function RepuestosPage({
   searchParams,
 }: RepuestosPageProps) {
   const params = await searchParams;
+
+  const searchInicial = params.search ?? "";
   const categoriaInicial = params.categoria ?? "";
 
   const products = await prisma.product.findMany({
@@ -78,6 +81,7 @@ export default async function RepuestosPage({
           categories={categories}
           brands={brands}
           initialCategory={categoriaInicial}
+          initialSearch={searchInicial}
         />
       </section>
     </main>
