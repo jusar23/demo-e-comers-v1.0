@@ -16,13 +16,11 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-3 sm:px-6">
 
         {/* =====================================================
-            NAVBAR PRINCIPAL
+            BARRA PRINCIPAL
         ====================================================== */}
-        <div className="flex h-[64px] items-center gap-2 sm:h-[72px] sm:gap-4">
+        <div className="flex h-16 items-center gap-2 sm:h-[72px] sm:gap-4">
 
-          {/* =========================
-              MENÚ MÓVIL
-          ========================== */}
+          {/* MENÚ MÓVIL */}
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -35,9 +33,7 @@ export default function Navbar() {
             {menuOpen ? "✕" : "☰"}
           </button>
 
-          {/* =========================
-              LOGO
-          ========================== */}
+          {/* LOGO */}
           <Link
             href="/"
             onClick={closeMenu}
@@ -58,9 +54,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* =========================
-              MENÚ DESKTOP
-          ========================== */}
+          {/* MENÚ DESKTOP */}
           <nav className="ml-3 hidden items-center gap-5 lg:ml-6 lg:gap-6 md:flex">
             <Link
               href="/"
@@ -98,25 +92,22 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* =========================
-              BUSCADOR DESKTOP
-          ========================== */}
+          {/* BUSCADOR DESKTOP */}
           <div className="ml-auto hidden min-w-0 flex-1 md:block md:max-w-md lg:max-w-lg">
             <Suspense fallback={null}>
               <SearchBar />
             </Suspense>
           </div>
 
-          {/* =========================
-              CARRITO
-          ========================== */}
+          {/* CARRITO - SIEMPRE A LA DERECHA */}
           <button
             type="button"
-            className="flex h-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white px-3 text-lg text-gray-700 shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 sm:px-4"
+            className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:ml-3 md:w-auto md:px-4"
             aria-label="Abrir carrito"
           >
             <span aria-hidden="true">🛒</span>
-            <span className="ml-2 hidden text-sm font-semibold sm:inline">
+
+            <span className="ml-2 hidden text-sm font-semibold md:inline">
               Carrito
             </span>
           </button>
@@ -137,13 +128,13 @@ export default function Navbar() {
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
             menuOpen
-              ? "max-h-[520px] border-t border-gray-100 opacity-100"
+              ? "max-h-[460px] border-t border-gray-100 opacity-100"
               : "max-h-0 opacity-0"
           }`}
         >
           <div className="py-3">
 
-            {/* Encabezado del menú */}
+            {/* CABECERA DEL MENÚ */}
             <div className="mb-2 flex items-center justify-between px-2">
               <div>
                 <p className="text-sm font-bold text-gray-900">
@@ -167,7 +158,7 @@ export default function Navbar() {
 
             <nav className="grid gap-1">
 
-              {/* Inicio */}
+              {/* INICIO */}
               <Link
                 href="/"
                 onClick={closeMenu}
@@ -184,7 +175,7 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* Repuestos */}
+              {/* REPUESTOS */}
               <Link
                 href="/repuestos"
                 onClick={closeMenu}
@@ -201,7 +192,7 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* Motocargueros */}
+              {/* MOTOCARGUEROS */}
               <Link
                 href="/motocargueros"
                 onClick={closeMenu}
@@ -218,7 +209,7 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* Motos */}
+              {/* MOTOS */}
               <Link
                 href="/motos"
                 onClick={closeMenu}
@@ -235,24 +226,7 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* Promociones */}
-              <Link
-                href="/promociones"
-                onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-50 text-lg">
-                  🔥
-                </span>
-
-                <span>Promociones</span>
-
-                <span className="ml-auto text-gray-300">
-                  →
-                </span>
-              </Link>
-
-              {/* Sobre nosotros */}
+              {/* SOBRE NOSOTROS */}
               <Link
                 href="/sobre-nosotros"
                 onClick={closeMenu}
@@ -263,23 +237,6 @@ export default function Navbar() {
                 </span>
 
                 <span>Sobre nosotros</span>
-
-                <span className="ml-auto text-gray-300">
-                  →
-                </span>
-              </Link>
-
-              {/* Contacto */}
-              <Link
-                href="/#contacto"
-                onClick={closeMenu}
-                className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-sm font-semibold text-gray-700 transition active:bg-gray-100 hover:bg-gray-50"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50 text-lg">
-                  📞
-                </span>
-
-                <span>Contacto</span>
 
                 <span className="ml-auto text-gray-300">
                   →
