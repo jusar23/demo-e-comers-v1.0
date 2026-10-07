@@ -92,17 +92,20 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          {/* BUSCADOR DESKTOP */}
-          <div className="ml-auto hidden min-w-0 flex-1 md:block md:max-w-md lg:max-w-lg">
+          {/* =====================================================
+              BUSCADOR
+              UNA SOLA INSTANCIA
+          ====================================================== */}
+          <div className="ml-auto min-w-0 flex-1 md:ml-auto md:max-w-md lg:max-w-lg">
             <Suspense fallback={null}>
               <SearchBar />
             </Suspense>
           </div>
 
-          {/* CARRITO - SIEMPRE A LA DERECHA */}
+          {/* CARRITO */}
           <button
             type="button"
-            className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:ml-3 md:w-auto md:px-4"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:w-auto md:px-4"
             aria-label="Abrir carrito"
           >
             <span aria-hidden="true">🛒</span>
@@ -111,15 +114,6 @@ export default function Navbar() {
               Carrito
             </span>
           </button>
-        </div>
-
-        {/* =====================================================
-            BUSCADOR MÓVIL
-        ====================================================== */}
-        <div className="pb-3 md:hidden">
-          <Suspense fallback={null}>
-            <SearchBar />
-          </Suspense>
         </div>
 
         {/* =====================================================
@@ -242,9 +236,20 @@ export default function Navbar() {
                   →
                 </span>
               </Link>
+
             </nav>
           </div>
         </div>
+
+        {/* =====================================================
+            BUSCADOR MÓVIL
+            MISMA INSTANCIA VISUAL
+        ====================================================== */}
+        <div className="pb-3 md:hidden">
+          {/* El buscador principal ya está arriba.
+              En móvil no necesitamos crear otro. */}
+        </div>
+
       </div>
     </header>
   );

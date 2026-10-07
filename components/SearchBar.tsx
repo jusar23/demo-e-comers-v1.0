@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type SearchResult = {
   id: number;
@@ -22,66 +22,74 @@ type SearchResult = {
 
 export default function SearchBar() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const [value, setValue] = useState(
-    searchParams.get("search") ?? ""
-  );
-
+  const [value, setValue] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const searchRef = useRef<HTMLDivElement>(null);
+  const requestId = useRef(0);
 
-  /*
-   * Buscar sugerencias mientras el usuario escribe.
-   */
+  // =========================================================
+  // BUSCAR MIENTRAS ESCRIBE
+  // =========================================================
+
   useEffect(() => {
     const query = value.trim();
 
     if (query.length < 2) {
       setResults([]);
-      setShowResults(false);
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
 
-    setIsLoading(true);
-    setShowResults(true);
+    setOpen(true);
+    setLoading(true);
 
-    const timeout = setTimeout(async () => {
+    const currentRequest = ++requestId.current;
+
+    const timer = setTimeout(async () => {
       try {
         const response = await fetch(
           `/api/search?q=${encodeURIComponent(query)}`
         );
 
         if (!response.ok) {
-          throw new Error(
-            "No fue posible realizar la búsqueda"
-          );
+          throw new Error("Error al buscar");
         }
 
         const data: SearchResult[] =
           await response.json();
 
+        // Ignorar respuestas viejas
+        if (currentRequest !== requestId.current) {
+          return;
+        }
+
         setResults(data);
       } catch (error) {
-        console.error(error);
-        setResults([]);
+        console.error("Error en búsqueda:", error);
+
+        if (currentRequest === requestId.current) {
+          setResults([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (currentRequest === requestId.current) {
+          setLoading(false);
+        }
       }
     }, 300);
 
     return () => {
-      clearTimeout(timeout);
+      clearTimeout(timer);
     };
   }, [value]);
 
-  /*
-   * Cerrar sugerencias al hacer clic fuera.
-   */
+  // =========================================================
+  // CERRAR AL HACER CLICK AFUERA
+  // =========================================================
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -90,7 +98,7 @@ export default function SearchBar() {
           event.target as Node
         )
       ) {
-        setShowResults(false);
+        setOpen(false);
       }
     }
 
@@ -107,59 +115,79 @@ export default function SearchBar() {
     };
   }, []);
 
-  /*
-   * Ejecutar búsqueda completa.
-   */
-  function performSearch() {
-    const query = value.trim();
+  // =========================================================
+  // REALIZAR BÚSQUEDA
+  // =========================================================
 
-    setShowResults(false);
+  function search() {
+    const query = value.trim();
 
     if (!query) {
       router.push("/repuestos");
       return;
     }
 
+    // Cerrar sugerencias
+    setOpen(false);
+
+    // Limpiar resultados anteriores
+    setResults([]);
+
+    // IMPORTANTE:
+    // invalidamos cualquier búsqueda anterior
+    requestId.current++;
+
+    // Limpiamos el buscador para poder escribir
+    // inmediatamente una búsqueda nueva.
+    setValue("");
+
     router.push(
       `/repuestos?search=${encodeURIComponent(query)}`
     );
   }
 
-  /*
-   * Submit del formulario.
-   */
+  // =========================================================
+  // FORMULARIO
+  // =========================================================
+
   function handleSubmit(
     event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
-    performSearch();
+
+    search();
   }
 
-  /*
-   * Teclado.
-   */
+  // =========================================================
+  // TECLADO
+  // =========================================================
+
   function handleKeyDown(
     event: KeyboardEvent<HTMLInputElement>
   ) {
     if (event.key === "Escape") {
-      setShowResults(false);
+      setOpen(false);
       return;
     }
 
-    if (
-      event.key === "Enter" &&
-      value.trim()
-    ) {
+    if (event.key === "Enter") {
       event.preventDefault();
-      performSearch();
+
+      if (value.trim()) {
+        search();
+      }
     }
   }
 
-  /*
-   * Abrir producto.
-   */
-  function handleResultClick(slug: string) {
-    setShowResults(false);
+  // =========================================================
+  // CLICK PRODUCTO
+  // =========================================================
+
+  function openProduct(slug: string) {
+    setOpen(false);
+    setResults([]);
+    setValue("");
+
     router.push(`/productos/${slug}`);
   }
 
@@ -168,11 +196,16 @@ export default function SearchBar() {
       ref={searchRef}
       className="relative w-full"
     >
+      {/* =====================================================
+          INPUT
+      ====================================================== */}
+
       <form
         onSubmit={handleSubmit}
         className="flex w-full"
       >
         <div className="relative flex-1">
+
           <span
             className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
             aria-hidden="true"
@@ -183,12 +216,18 @@ export default function SearchBar() {
           <input
             type="search"
             value={value}
-            onChange={(event) =>
-              setValue(event.target.value)
-            }
+            onChange={(event) => {
+              setValue(event.target.value);
+
+              if (
+                event.target.value.trim().length >= 2
+              ) {
+                setOpen(true);
+              }
+            }}
             onFocus={() => {
               if (value.trim().length >= 2) {
-                setShowResults(true);
+                setOpen(true);
               }
             }}
             onKeyDown={handleKeyDown}
@@ -197,10 +236,10 @@ export default function SearchBar() {
             className="h-12 w-full rounded-l-xl border border-gray-300 bg-white pl-12 pr-10 text-sm text-black placeholder:text-gray-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
 
-          {isLoading && (
+          {loading && (
             <span
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400"
-              aria-label="Buscando"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-sm"
+              aria-hidden="true"
             >
               ⏳
             </span>
@@ -215,127 +254,121 @@ export default function SearchBar() {
         </button>
       </form>
 
-      {/* Sugerencias */}
-      {showResults &&
-        value.trim().length >= 2 && (
-          <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
-            {isLoading ? (
-              <div className="px-5 py-6 text-center text-sm text-gray-500">
-                Buscando repuestos...
-              </div>
-            ) : results.length > 0 ? (
-              <div>
-                <div className="border-b border-gray-100 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
-                    Repuestos encontrados
-                  </p>
-                </div>
+      {/* =====================================================
+          SUGERENCIAS
+      ====================================================== */}
 
-                <div className="max-h-[420px] overflow-y-auto">
-                  {results.map((product) => (
-                    <button
-                      key={product.id}
-                      type="button"
-                      onClick={() =>
-                        handleResultClick(
-                          product.slug
-                        )
-                      }
-                      className="flex w-full items-center gap-4 border-b border-gray-100 px-4 py-3 text-left transition last:border-b-0 hover:bg-gray-50"
-                    >
-                      {/* Miniatura */}
-                      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
-                        {product.image?.trim() ? (
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            loading="lazy"
-                            className="h-full w-full object-contain p-1"
-                          />
-                        ) : (
-                          <span
-                            className="text-2xl"
-                            aria-hidden="true"
-                          >
-                            🔧
-                          </span>
+      {open && value.trim().length >= 2 && (
+        <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[100] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
+
+          {loading ? (
+            <div className="px-5 py-6 text-center text-sm text-gray-500">
+              Buscando repuestos...
+            </div>
+          ) : results.length > 0 ? (
+            <>
+              <div className="border-b border-gray-100 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Repuestos encontrados
+                </p>
+              </div>
+
+              <div className="max-h-[420px] overflow-y-auto">
+
+                {results.map((product) => (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() =>
+                      openProduct(product.slug)
+                    }
+                    className="flex w-full items-center gap-4 border-b border-gray-100 px-4 py-3 text-left hover:bg-gray-50"
+                  >
+
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
+                      {product.image?.trim() ? (
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      ) : (
+                        <span className="text-2xl">
+                          🔧
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+
+                      <p className="line-clamp-2 text-sm font-semibold text-gray-900">
+                        {product.name}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        {product.brand} · Ref.{" "}
+                        {product.reference}
+                      </p>
+
+                      <p className="mt-1 text-xs text-blue-600">
+                        {product.category}
+                      </p>
+
+                    </div>
+
+                    <div className="hidden text-right sm:block">
+                      <p className="text-sm font-bold text-gray-900">
+                        $
+                        {product.price.toLocaleString(
+                          "es-CO"
                         )}
-                      </div>
+                      </p>
+                    </div>
 
-                      {/* Información */}
-                      <div className="min-w-0 flex-1">
-                        <p className="line-clamp-2 text-sm font-semibold text-gray-900">
-                          {product.name}
-                        </p>
+                  </button>
+                ))}
 
-                        <p className="mt-1 text-xs text-gray-500">
-                          {product.brand} · Ref.{" "}
-                          {product.reference}
-                        </p>
-
-                        <p className="mt-1 text-xs text-blue-600">
-                          {product.category}
-                        </p>
-                      </div>
-
-                      {/* Precio */}
-                      <div className="hidden shrink-0 text-right sm:block">
-                        <p className="text-sm font-bold text-gray-900">
-                          $
-                          {product.price.toLocaleString(
-                            "es-CO"
-                          )}
-                        </p>
-
-                        <p className="mt-1 text-xs text-gray-400">
-                          Ver producto →
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Ver todos */}
-                <button
-                  type="button"
-                  onClick={performSearch}
-                  className="w-full border-t border-gray-100 bg-gray-50 px-4 py-3 text-center text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
-                >
-                  Ver todos los resultados para "
-                  {value.trim()}"
-                </button>
               </div>
-            ) : (
-              <div className="px-5 py-7 text-center">
-                <div
-                  className="text-3xl"
-                  aria-hidden="true"
-                >
-                  🔍
-                </div>
 
-                <p className="mt-2 text-sm font-semibold text-gray-700">
-                  No encontramos repuestos
-                </p>
+              {/* VER TODOS */}
+              <button
+                type="button"
+                onClick={search}
+                className="w-full border-t border-gray-100 bg-gray-50 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+              >
+                Ver todos los resultados para "
+                {value.trim()}"
+              </button>
+            </>
+          ) : (
+            <div className="px-5 py-7 text-center">
 
-                <p className="mt-1 text-xs text-gray-500">
-                  Intenta con otro nombre,
-                  referencia o marca.
-                </p>
-
-                {/* Aunque no haya sugerencias,
-                    permite buscar el término completo */}
-                <button
-                  type="button"
-                  onClick={performSearch}
-                  className="mt-4 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700"
-                >
-                  Buscar "{value.trim()}"
-                </button>
+              <div className="text-3xl">
+                🔍
               </div>
-            )}
-          </div>
-        )}
+
+              <p className="mt-2 text-sm font-semibold text-gray-700">
+                No encontramos repuestos
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                Intenta con otro nombre, referencia o
+                marca.
+              </p>
+
+              <button
+                type="button"
+                onClick={search}
+                className="mt-4 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-700"
+              >
+                Buscar "{value.trim()}"
+              </button>
+
+            </div>
+          )}
+
+        </div>
+      )}
     </div>
   );
 }

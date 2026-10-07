@@ -1,6 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import { useSearchParams } from "next/navigation";
 
 import ProductCard from "@/components/ProductCard";
 import ProductFilters from "@/components/ProductFilters";
@@ -33,35 +39,85 @@ export default function ProductCatalog({
   initialCategory = "",
   initialSearch = "",
 }: ProductCatalogProps) {
-  const [search, setSearch] = useState(initialSearch);
-  const [category, setCategory] = useState(initialCategory);
-  const [brand, setBrand] = useState("");
-  const [sort, setSort] = useState("");
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] =
+    useState(initialSearch);
+
+  const [category, setCategory] =
+    useState(initialCategory);
+
+  const [brand, setBrand] =
+    useState("");
+
+  const [sort, setSort] =
+    useState("");
+
+  /*
+   * =========================================================
+   * SINCRONIZAR BÚSQUEDA CON LA URL
+   * =========================================================
+   *
+   * Cuando el SearchBar cambia:
+   *
+   * /repuestos?search=filtro
+   *
+   * a:
+   *
+   * /repuestos?search=bujia
+   *
+   * actualizamos el estado interno del catálogo.
+   */
+
+  useEffect(() => {
+    const urlSearch =
+      searchParams.get("search") ?? "";
+
+    const urlCategory =
+      searchParams.get("categoria") ?? "";
+
+    setSearch(urlSearch);
+    setCategory(urlCategory);
+  }, [searchParams]);
+
+  /*
+   * =========================================================
+   * FILTRAR PRODUCTOS
+   * =========================================================
+   */
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
     /*
-     * Buscar por:
-     * - nombre
-     * - referencia
-     * - marca
-     * - categoría
+     * BUSCAR
      */
     if (search.trim()) {
-      const searchValue = search.toLowerCase().trim();
+      const searchValue =
+        search.toLowerCase().trim();
 
       result = result.filter(
         (product) =>
-          product.name.toLowerCase().includes(searchValue) ||
-          product.reference.toLowerCase().includes(searchValue) ||
-          product.brand.toLowerCase().includes(searchValue) ||
-          product.category.toLowerCase().includes(searchValue)
+          product.name
+            .toLowerCase()
+            .includes(searchValue) ||
+
+          product.reference
+            .toLowerCase()
+            .includes(searchValue) ||
+
+          product.brand
+            .toLowerCase()
+            .includes(searchValue) ||
+
+          product.category
+            .toLowerCase()
+            .includes(searchValue)
       );
     }
 
     /*
-     * Filtrar por categoría
+     * CATEGORÍA
      */
     if (category) {
       result = result.filter(
@@ -72,7 +128,7 @@ export default function ProductCatalog({
     }
 
     /*
-     * Filtrar por marca
+     * MARCA
      */
     if (brand) {
       result = result.filter(
@@ -83,21 +139,25 @@ export default function ProductCatalog({
     }
 
     /*
-     * Ordenar por precio menor a mayor
+     * ORDENAR POR PRECIO ASCENDENTE
      */
     if (sort === "price-asc") {
-      result.sort((a, b) => a.price - b.price);
+      result.sort(
+        (a, b) => a.price - b.price
+      );
     }
 
     /*
-     * Ordenar por precio mayor a menor
+     * ORDENAR POR PRECIO DESCENDENTE
      */
     if (sort === "price-desc") {
-      result.sort((a, b) => b.price - a.price);
+      result.sort(
+        (a, b) => b.price - a.price
+      );
     }
 
     /*
-     * Ordenar por nombre
+     * ORDENAR A-Z
      */
     if (sort === "name-asc") {
       result.sort((a, b) =>
@@ -106,7 +166,7 @@ export default function ProductCatalog({
     }
 
     /*
-     * Más recientes
+     * MÁS RECIENTES
      */
     if (!sort) {
       result.sort(
@@ -125,6 +185,12 @@ export default function ProductCatalog({
     sort,
   ]);
 
+  /*
+   * =========================================================
+   * LIMPIAR FILTROS
+   * =========================================================
+   */
+
   function clearFilters() {
     setSearch("");
     setCategory("");
@@ -134,7 +200,11 @@ export default function ProductCatalog({
 
   return (
     <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-      {/* Filtros */}
+
+      {/* =====================================================
+          FILTROS
+      ====================================================== */}
+
       <aside>
         <ProductFilters
           categories={categories}
@@ -151,28 +221,46 @@ export default function ProductCatalog({
         />
       </aside>
 
-      {/* Productos */}
+      {/* =====================================================
+          PRODUCTOS
+      ====================================================== */}
+
       <div>
-        {/* Encabezado */}
+
+        {/* ENCABEZADO */}
+
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+
           <div>
+
             <h2 className="text-2xl font-bold text-gray-900">
-              {search
-                ? `Resultados para "${search}"`
-                : category
-                  ? `Repuestos de ${category}`
-                  : "Todos los repuestos"}
+
+              {search ? (
+                `Resultados para "${search}"`
+              ) : category ? (
+                `Repuestos de ${category}`
+              ) : (
+                "Todos los repuestos"
+              )}
+
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
+
               {filteredProducts.length}{" "}
+
               {filteredProducts.length === 1
                 ? "producto encontrado"
                 : "productos encontrados"}
+
             </p>
+
           </div>
 
-          {(search || category || brand || sort) && (
+          {(search ||
+            category ||
+            brand ||
+            sort) && (
             <button
               onClick={clearFilters}
               className="text-sm font-semibold text-blue-600 hover:text-blue-700"
@@ -180,11 +268,17 @@ export default function ProductCatalog({
               Limpiar filtros
             </button>
           )}
+
         </div>
 
-        {/* Sin resultados */}
+        {/* =====================================================
+            SIN RESULTADOS
+        ====================================================== */}
+
         {filteredProducts.length === 0 ? (
+
           <div className="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+
             <div className="text-5xl">
               🔍
             </div>
@@ -194,8 +288,10 @@ export default function ProductCatalog({
             </h3>
 
             <p className="mt-2 text-gray-500">
-              No encontramos repuestos que coincidan
-              con "{search}".
+              {search
+                ? `No encontramos repuestos que coincidan con "${search}".`
+                : "Intenta cambiar los filtros."
+              }
             </p>
 
             <button
@@ -204,19 +300,32 @@ export default function ProductCatalog({
             >
               Ver todos los repuestos
             </button>
+
           </div>
+
         ) : (
-          /* Cards */
+
+          /* ===================================================
+             CARDS
+          ==================================================== */
+
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))}
+
+            {filteredProducts.map(
+              (product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                />
+              )
+            )}
+
           </div>
+
         )}
+
       </div>
+
     </div>
   );
 }
