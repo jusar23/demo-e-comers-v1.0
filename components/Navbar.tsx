@@ -110,7 +110,7 @@ export default function Navbar() {
           >
             <span aria-hidden="true">🛒</span>
 
-            <span className="ml-2 hidden text-sm font-semibold md:inline">
+            <span className="ml-2 hidden text-sm font-semibold md:inline text-gray-600">
               Carrito
             </span>
           </button>
