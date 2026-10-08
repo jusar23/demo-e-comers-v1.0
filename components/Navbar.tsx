@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import { Suspense, useState } from "react";
+
 import SearchBar from "./SearchBar";
+import CartPreview from "./cart/CartPreview";
 import { useCart } from "@/components/cart/CartProvider";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+
   const { totalItems } = useCart();
+
   const closeMenu = () => {
     setMenuOpen(false);
   };
@@ -19,7 +24,7 @@ export default function Navbar() {
         {/* =====================================================
             BARRA PRINCIPAL
         ====================================================== */}
-        <div className="flex h-16 items-center gap-2 sm:h-[72px] sm:gap-4">
+        <div className="relative flex h-16 items-center gap-2 sm:h-[72px] sm:gap-4">
 
           {/* MENÚ MÓVIL */}
           <button
@@ -56,7 +61,7 @@ export default function Navbar() {
           </Link>
 
           {/* MENÚ DESKTOP */}
-          <nav className="ml-3 hidden items-center gap-5 lg:ml-6 lg:gap-6 md:flex">
+          <nav className="ml-3 hidden items-center gap-5 md:flex lg:ml-6 lg:gap-6">
             <Link
               href="/"
               className="whitespace-nowrap text-sm font-medium text-gray-700 transition hover:text-blue-600"
@@ -96,33 +101,79 @@ export default function Navbar() {
           {/* =====================================================
               BUSCADOR
               UNA SOLA INSTANCIA
+              
+              MÓVIL:
+              Se posiciona debajo de la barra principal.
+
+              DESKTOP:
+              Vuelve a la posición normal dentro de la barra.
           ====================================================== */}
-          <div className="ml-auto min-w-0 flex-1 md:ml-auto md:max-w-md lg:max-w-lg">
-            <Suspense fallback={null}>
-              <SearchBar />
-            </Suspense>
+          <div className="absolute left-0 right-0 top-full px-3 pb-2 md:static md:ml-auto md:p-0">
+            <div className="mx-auto w-full max-w-7xl md:max-w-md lg:max-w-lg">
+              <Suspense fallback={null}>
+                <SearchBar />
+              </Suspense>
+            </div>
           </div>
+          {/* =====================================================
+              CARRITO
+          ====================================================== */}
+          <div className="ml-auto md:ml-3">
 
-          {/* CARRITO */}
-         <Link
-          href="/carrito"
-          className="relative ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:ml-3 md:w-auto md:px-4"
-          aria-label={`Abrir carrito. ${totalItems} productos`}
-        >
-          <span aria-hidden="true">
-            🛒
-          </span>
+            {/* DESKTOP / TABLET */}
 
-          <span className="ml-2 hidden text-sm font-semibold md:inline text-gray-700">
-            Carrito
-          </span>
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
+              className="relative hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:flex md:w-auto md:px-4"
+              aria-label={`Abrir carrito. ${totalItems} ${
+                totalItems === 1
+                  ? "producto"
+                  : "productos"
+              }`}
+            >
+              <span aria-hidden="true">
+                🛒
+              </span>
 
-          {totalItems > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-              {totalItems > 99 ? "99+" : totalItems}
-            </span>
-          )}
-        </Link>
+              <span className="ml-2 text-sm font-semibold text-gray-700">
+                Carrito
+              </span>
+
+              {totalItems > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {totalItems > 99
+                    ? "99+"
+                    : totalItems}
+                </span>
+              )}
+            </button>
+
+            {/* MÓVIL */}
+
+            <Link
+              href="/carrito"
+              className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:hidden"
+              aria-label={`Abrir carrito. ${totalItems} ${
+                totalItems === 1
+                  ? "producto"
+                  : "productos"
+              }`}
+            >
+              <span aria-hidden="true">
+                🛒
+              </span>
+
+              {totalItems > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  {totalItems > 99
+                    ? "99+"
+                    : totalItems}
+                </span>
+              )}
+            </Link>
+
+          </div>
         </div>
 
         {/* =====================================================
@@ -131,7 +182,7 @@ export default function Navbar() {
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out md:hidden ${
             menuOpen
-              ? "max-h-[460px] border-t border-gray-100 opacity-100"
+              ? "max-h-[370px] border-t border-gray-100 opacity-100"
               : "max-h-0 opacity-0"
           }`}
         >
@@ -251,13 +302,17 @@ export default function Navbar() {
         </div>
 
         {/* =====================================================
-            BUSCADOR MÓVIL
-            MISMA INSTANCIA VISUAL
+            ESPACIO PARA EL BUSCADOR EN MÓVIL
         ====================================================== */}
-        <div className="pb-3 md:hidden">
-          {/* El buscador principal ya está arriba.
-              En móvil no necesitamos crear otro. */}
-        </div>
+        <div className="h-[62px] md:hidden" />
+
+        {/* =====================================================
+            CARRITO PREVIEW
+        ====================================================== */}
+        <CartPreview
+          open={cartOpen}
+          onClose={() => setCartOpen(false)}
+        />
 
       </div>
     </header>
