@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import SearchBar from "./SearchBar";
+import { useCart } from "@/components/cart/CartProvider";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const { totalItems } = useCart();
   const closeMenu = () => {
     setMenuOpen(false);
   };
@@ -103,17 +104,25 @@ export default function Navbar() {
           </div>
 
           {/* CARRITO */}
-          <button
-            type="button"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:w-auto md:px-4"
-            aria-label="Abrir carrito"
-          >
-            <span aria-hidden="true">🛒</span>
+         <Link
+          href="/carrito"
+          className="relative ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-xl shadow-sm transition active:scale-95 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 md:ml-3 md:w-auto md:px-4"
+          aria-label={`Abrir carrito. ${totalItems} productos`}
+        >
+          <span aria-hidden="true">
+            🛒
+          </span>
 
-            <span className="ml-2 hidden text-sm font-semibold md:inline text-gray-600">
-              Carrito
+          <span className="ml-2 hidden text-sm font-semibold md:inline text-gray-700">
+            Carrito
+          </span>
+
+          {totalItems > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+              {totalItems > 99 ? "99+" : totalItems}
             </span>
-          </button>
+          )}
+        </Link>
         </div>
 
         {/* =====================================================

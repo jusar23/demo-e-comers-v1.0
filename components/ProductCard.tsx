@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AddToCartButton from "@/components/cart/AddToCartButton";
 
 type Product = {
   id: number;
@@ -98,6 +99,19 @@ export default function ProductCard({
         >
           Ver producto
         </Link>
+        <div className="mt-3">
+          <AddToCartButton
+            product={{
+              id: product.id,
+              name: product.name,
+              slug: product.slug,
+              reference: product.reference,
+              price: Number(product.price),
+              stock: product.stock,
+              image: product.image,
+            }}
+          />
+        </div>
       </div>
     </article>
   );

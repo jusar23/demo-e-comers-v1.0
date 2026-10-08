@@ -219,10 +219,6 @@ export default async function MotosPage() {
               comerciales.
             </p>
 
-            <p className="mt-5 text-sm text-gray-500">
-              El canal de contacto se configurará cuando
-              tengamos los datos comerciales de la tienda.
-            </p>
           </div>
         </section>
       </div>

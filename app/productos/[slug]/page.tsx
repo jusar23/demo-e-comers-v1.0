@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ImageGallery from "@/components/ImageGallery";
+import AddToCartButton from "@/components/cart/AddToCartButton";
 
 type ProductPageProps = {
   params: Promise<{
@@ -134,14 +135,26 @@ export default async function ProductPage({
                 </p>
               </div>
 
-              <button
-                disabled={!isAvailable}
-                className="mt-8 w-full rounded-xl bg-blue-600 px-6 py-4 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-              >
-                {isAvailable
-                  ? "Agregar al carrito"
-                  : "Producto agotado"}
-              </button>
+              {isAvailable ? (
+                <AddToCartButton
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    reference: product.reference,
+                    price: Number(product.price),
+                    stock: product.stock,
+                    image: product.image,
+                  }}
+                />
+              ) : (
+                <button
+                  disabled
+                  className="mt-8 w-full cursor-not-allowed rounded-xl bg-gray-300 px-6 py-4 font-semibold text-gray-500"
+                >
+                  Producto agotado
+                </button>
+              )}
             </div>
           </div>
         </div>
